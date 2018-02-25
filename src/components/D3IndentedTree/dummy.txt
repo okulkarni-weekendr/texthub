@@ -1,0 +1,14 @@
+This is point one. This is going to become very nasty as the size of the text increases... there is no point in increasing this beyond an extent
+Now I need to add some data here. This is point one of main parent point. It can . have children as well
+We use DynamoDB to store Keys that determine which rows of data to extract from our RDS MySQL database. An example Key is MCS2017, which stands for, Marketing Campaign Spring 2017
+The state machine example shown above uses Keys 31, 32, and 33 in the first ChoiceState and Keys 21 and 22 in the second ChoiceState. These keys represent marketing campaigns for a given day.
+Create a schedule in CloudWatch Events. Specify conditions for RDS data extracts. Create Amazon Redshift input files
+In this example, the cron expression invokes the Step Functions state machine at 3:00am and 2:00pm (UTC) every day.
+As described in the solution architecture, the purpose of this Lambda function is to delete existing data in Amazon Redshift and retrieve keys from DynamoDB. 
+For example, on Monday, there are only two campaigns requested. The ChoiceState with Keys 21 and 22 is executed.
+ Each campaign has a specific start and end date and the corresponding dataset is stored in RDS MySQL. A record in RDS contains about 600 columns, and each Key can represent up to 20K records
+Create rules in CloudWatch Events to trigger the Step Functions state machine on an automated schedule. The following is an example cron expression to automate your schedule
+In our use case, we found that deleting existing records was more efficient and less time-consuming than finding the delta and updating existing records. On average, an Amazon Redshift table can contain about 36 million cells, which translates to roughly 65K records. The following is the code snippet for the first Lambda function in Java 8:
+The variable $.keyT represents the number of keys retrieved from DynamoDB. This variable determines which of the parallel branches should be executed.
+ if $.keyT equals 3, the second Lambda function is executed three times in parallel with keys, $key1, $key2 and $key3 retrieved from DynamoDB.
+Therefore, choices under ChoiceState are manually created and assigned hardcoded StringEquals values. These values represent the number of parallel executions for the second Lambda function.
