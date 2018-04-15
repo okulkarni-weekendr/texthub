@@ -1,0 +1,41 @@
+.editor {
+    padding: 2.0em;
+    display: flex;
+}
+
+.text-editor {
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+
+.app-footer{
+    position: absoute;
+    bottom: 0px;
+    width: 100%;
+    height: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1em;
+    display: flex;
+  }
+
+.right-span-border {
+    margin-right: 0.5rem;
+    margin-left: 0.3rem;
+    border: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.date-span-border {
+    margin-right: 0.0rem;
+    margin-left: 0.3rem;
+    border: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.svg{
+   flex: 1;
+}
+
+.tree {
+    flex: 2;
+}

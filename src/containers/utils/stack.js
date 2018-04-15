@@ -26,7 +26,7 @@ class Stack {
       }
 
       isEmpty(){
-          return this.items.length === 0 ? true : false;
+          return this.count === 0 ? true : false;
       }
 }
 

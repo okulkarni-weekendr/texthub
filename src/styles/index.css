@@ -1,10 +1,112 @@
+@import url("https://fonts.googleapis.com/css?family=Lato:400,700,400italic");
+.container {
+  max-width: 1200px;
+  margin: 0 auto; }
+
+.links line {
+  stroke: grey; }
+
+.svgDiv {
+  overflow: scroll;
+  height: 900px;
+  width: auto; }
+
+.tooltip {
+  position: absolute;
+  background-color: lightgrey;
+  padding: 10px; }
+
+/*this is for the tree */
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1px; }
+
+.node text {
+  font: 12px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; }
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1px; }
+
+.column input {
+  border-radius: 3px;
+  margin: 10px 0;
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.43);
+  font-size: 16px;
+  width: 80%; }
+
+.column label {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 200; }
+
+.reset {
+  border: none;
+  background: transparent;
+  color: #d0021b;
+  display: block;
+  width: 100%;
+  text-align: center; }
+
+.reset:hover {
+  cursor: pointer; }
+
+.node rect {
+  cursor: pointer;
+  fill: #fff;
+  fill-opacity: 0.5;
+  stroke: #3182bd;
+  stroke-width: 1.5px; }
+
+.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px; }
+
+.editor {
+  padding: 2.0em;
+  display: flex; }
+
+.text-editor {
+  padding-right: 0px !important;
+  padding-left: 0px !important; }
+
+.app-footer {
+  position: absoute;
+  bottom: 0px;
+  width: 100%;
+  height: 20px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1em;
+  display: flex; }
+
+.right-span-border {
+  margin-right: 0.5rem;
+  margin-left: 0.3rem;
+  border: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.1); }
+
+.date-span-border {
+  margin-right: 0.0rem;
+  margin-left: 0.3rem;
+  border: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.1); }
+
+.svg {
+  flex: 1; }
+
+.tree {
+  flex: 2; }
+
 /*!
  * Bootstrap v4.0.0-beta.2 (https://getbootstrap.com)
  * Copyright 2011-2017 The Bootstrap Authors
  * Copyright 2011-2017 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
-@import url("https://fonts.googleapis.com/css?family=Lato:400,700,400italic");
 :root {
   --blue: #2C3E50;
   --indigo: #6610f2;

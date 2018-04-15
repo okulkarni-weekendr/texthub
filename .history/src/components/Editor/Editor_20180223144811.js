@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Stack from '../utils/stack';
 import { Editor, EditorState, RichUtils, DefaultDraftBlockRenderMap } from 'draft-js';
-import { Divider } from 'semantic-ui-react';
 import { Map } from 'immutable';
 import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
 import utilFn from "./utilFunctions";

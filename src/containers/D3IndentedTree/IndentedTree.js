@@ -1,11 +1,8 @@
 import React from 'react';
 import * as d3 from 'd3';
-import data from './flare';
-
-// Component that draws a single color swatch
-const Swatch = ({ color, width, x, y }) => (
-    <rect width={width} height="20" x={x} y={y} style={{fill: color}} />
-)
+import data from './data';
+import PropTypes from 'prop-types';
+import constants from '../../constants/EditorConstants';
 
 // Draws an entire color scale
 class IndentedTree extends React.Component {
@@ -15,41 +12,25 @@ class IndentedTree extends React.Component {
         this.state = {
             colors: d3.schemeCategory20,
             width: 50,
-            data: data,
+            data: props.data,
             nodesSort: []
         };
 
         this.update = this.update.bind(this);
         this.color = this.color.bind(this);
         this.click = this.click.bind(this);
-    }
-
-    componentWillMount() {
-
-        let root = d3.hierarchy(this.state.data); // Constructs a root node from the specified hierarchical data.
-        let tree = d3.tree().nodeSize([0, 30]); //Invokes tree
-        if(data !== null){
-            this.setState(
-                {
-                    data: data.treeData,
-                    root: root,
-                    tree: tree,
-                    nodes: tree(root)
-                }
-            );
-        }
+        this.wrap = this.wrap.bind(this);
+        this.printWordCount = this.printWordCount.bind(this);
     }
 
     update(source) {
 
         let margin = {top: 50, right: 20, bottom: 30, left: 20},
-            width = 960 - margin.right - margin.left,
-            barHeight = 20,
-            barWidth = width * .5;
+            barHeight = 65;
 
         const svg = d3.select(this.refs.anchor);
 
-        svg .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        svg.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         let i = 0,
             duration = 400;
@@ -58,11 +39,10 @@ class IndentedTree extends React.Component {
             .x(function(d) { return d.y; })
             .y(function(d) { return d.x; });
 
+
         // Compute the flattened node list. TODO use d3.layout.hierarchy.
         let nodes = this.state.nodes; //returns a single node with the properties of d3.tree()
         let nodesSort = [];
-        console.log(nodes.length);
-
 
         // returns all nodes and each descendant in pre-order traversal (sort)
         let nodeCount = 0;
@@ -99,17 +79,41 @@ class IndentedTree extends React.Component {
 
         // Enter any new nodes at the parent's previous position.
         nodeEnter.append("rect")
-            .attr("y", -barHeight / 2)
-            .attr("height", barHeight)
-            .attr("width", barWidth)
+            .attr("y", -constants.IndentedTree.BAR_HEIGHT_TITLE / 4)
+            .attr("height", function(d){
+                return d.data.name === undefined
+                    ? constants.IndentedTree.BAR_HEIGHT_TITLE
+                    : d.data.name.split('').length < 50
+                        ? constants.IndentedTree.BAR_HEIGHT_TITLE
+                        : constants.IndentedTree.BAR_WIDTH_TEXT;
+            })
+            .attr("width", function(d){
+                return d.data.name === undefined
+                    ? constants.IndentedTree.BAR_WIDTH_TITLE
+                    : d.data.name.split('').length < 50
+                        ? constants.IndentedTree.BAR_WIDTH_TITLE
+                        : constants.IndentedTree.BAR_WIDTH_TEXT;
+            })
             .style("fill", this.color)
             .on("click", this.click);
 
         nodeEnter.append("text")
-            .attr("dy", 3.5)
+            .attr("dy", 10)
             .attr("dx", 5.5)
+            .attr("x", constants.IndentedTree.NODEENTER_TEXT_X)
+            .style("font-size", function (d) {
+                console.log(d.data.name)
+                return d.data.name === undefined
+                    ? "12px"
+                    : d.data.name.split('').length < 50 ? "16px" : "12px" ; })
             .text(function (d) {
-                return d.depth == 0 ? d.data.name + " >>>" : d.depth == 1 ? d.data.name + " >>" : d.data.name ; });
+                return d.depth === 0 ? d.data.name : d.depth === 1 ? d.data.name : d.data.name ; })
+            .call(function(d){
+                return d.data.name.split('').length > 100
+                    ?   this.wrap
+                    :   null
+            }, constants.IndentedTree.TEXT_WRAP_WIDTH)
+            .call(this.printWordCount);
 
         // Transition nodes to their new position.
         nodeEnter.transition()
@@ -184,14 +188,87 @@ class IndentedTree extends React.Component {
 
     componentDidMount() {
 
-        console.log('componentWillUpdate statement');
-        let root = this.state.root;
-        this.update(root);
+        let root = d3.hierarchy(this.state.data); // Constructs a root node from the specified hierarchical data.
+        let tree = d3.tree().nodeSize([0, 30]); //Invokes tree
+        if(data !== null){
+            this.setState(
+                {
+                    root: root,
+                    tree: tree,
+                    nodes: tree(root)
+                }, () => {
+                    let root = this.state.root;
+                    this.update(root);
+                }
+            );
+        }
+    }
 
+    componentDidUpdate(prevProps, prevState){
+        let root = d3.hierarchy(this.state.data); // Constructs a root node from the specified hierarchical data.
+        this.update(root);
+    }
+
+    //whole tree is being re-rendered each time because we are passing same root to the tree.
+    //this can be avoided with entering the new root..
+    componentWillReceiveProps(nextProps) {
+        let root = d3.hierarchy(nextProps.data); // Constructs a root node from the specified hierarchical data.
+        let tree = d3.tree().nodeSize([0, 30]); //Invokes tree
+
+        if(nextProps.data !== null){
+            this.setState(
+                {
+                    data: nextProps.data,
+                    root: root,
+                    tree: tree,
+                    nodes: tree(root)
+                });
+        }
+    }
+
+    wrap(text, width) {
+        text.each(function () {
+            var text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineHeight = 1.2, // ems
+                x = text.attr("x"),
+                y = text.attr("y"),
+                dy = 0,
+                tspan = text.text(null)
+                    .append("tspan")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("dy", 1.1 + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dx", x)
+                        .attr("dy", lineHeight + dy + "em")
+                        .text(word);
+                }
+            }
+        });
+    }
+
+    printWordCount(text){
+        let length;
+        text.each(function() {
+            var text = d3.select(this);
+            length = text.text().split('').length;
+        })
+        return length;
     }
 
     render() {
-
         if(!data){
             console.log('data doesnt exist');
             return null;
@@ -201,6 +278,10 @@ class IndentedTree extends React.Component {
             <g ref='anchor' />
         )
     }
+}
+
+IndentedTree.propTypes = {
+    data: PropTypes.object.isRequired
 }
 
 export default IndentedTree;
